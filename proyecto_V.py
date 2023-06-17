@@ -117,7 +117,7 @@ def comprar_asiento():
                 eleccion=""
                 mostrar_opciones()
 
-def mostrar_opciones(): #cambio git
+def mostrar_opciones(): #cambio git 3333
     global op
     op=""
     while(op != "1" and op != "2" and op != "3" and op != "4" and op != "5"):
