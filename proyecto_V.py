@@ -48,7 +48,7 @@ def mostrar_asientos():
         print(" |")
     print("\n")
     if op=="1":
-        mostrar_opciones() #solo lo muestra cuando la opción es 1 en el menu mostrar_opciones; si es 2 (Compra de asientos), tambien visualiza los asientos, pero no vuelve a mostrar las opciones sino que continua con la compra de asientos.
+        mostrar_opciones() #solo lo muestra cuando la opción es 1 en el menu mostrar_opciones; si es op==2 (Compra de asientos), tambien visualiza los asientos, pero no vuelve a mostrar las opciones, sino que continua con la compra de asientos.
      
 #función registrar datos del pasajero:
 
@@ -101,27 +101,30 @@ def comprar_asiento():
         mostrar_asientos()
         print("Los asientos marcados con una X, no se encuentran disponibles.\nDesde el asiento 31 al 42 son para pasajeros VIP.\n\nLos precios son:\n\n - Asiento normal: $ 78.900\n - Asiento VIP: $ 240.000\n")
         eleccion=int(input("Favor, Seleccione un asiento: "))
+        eleccion={"Asiento":eleccion}
+        cliente.append(eleccion)
         if 0<eleccion and eleccion<31:
             precio=78900
         elif 31<=eleccion and eleccion<43:
             precio=240000
         print("\nEl precio a pagar es de: $",precio)
         while(conf != "S" and conf != "C" and conf != "M"):
-            conf=input("\nPara confirmar asiento, presione S.\nPara cambiar asiento presione C.\nPara anular elección y volver al menu pricipal presione M:\n\n").upper()
+            conf=input("\nPara confirmar asiento, presione S.\nPara cambiar asiento presione C.\nPara anular elección y volver al menu pricipal presione M\n\n Opcion: ").upper()
         else:
             if conf=="S":
-                print("")
+                for datos in cliente:
+                    print(datos,":",cliente[datos])
             elif conf=="C":
                 retorno="R"
             elif conf=="M":
                 eleccion=""
                 mostrar_opciones()
 
-def mostrar_opciones(): #cambio git 3333
+def mostrar_opciones():
     global op
     op=""
     while(op != "1" and op != "2" and op != "3" and op != "4" and op != "5"):
-        op= input("Ingrese una opcion:\n \n1. Ver asientos disponibles \n2. Comprar asiento \n3. Anular vuelo \n4. Modificar datos de pasajero \n5. Salir\n\n")
+        op= input("Ingrese una opcion:\n \n1. Ver asientos disponibles \n2. Comprar asiento \n3. Anular vuelo \n4. Modificar datos de pasajero \n5. Salir\n\nOpcion: ")
     else:
         if op=="1":
             mostrar_asientos()
@@ -133,7 +136,7 @@ def mostrar_opciones(): #cambio git 3333
             print("algo")
         elif op=="5":
             print("hasta pronto")
-
+    
 #inicio del programa: comprueba si existe registro de asientos en archivo"asientos.txt", sino crea un arreglo y lo guarda en un archivo txt: "asientos.txt"
 
 try:         # comprueba que existe registro de asientos tomados anteriormente
