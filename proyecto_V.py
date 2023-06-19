@@ -1,10 +1,5 @@
 import numpy as np
-
-
 asientos_ocupados=[] #asientos ocupados
-
-
-
 #función mostrar los asientos disponibles // printea los números del array los ordena y reemplaza por X cuando coincide los asientos ocupados con el del array original
 def mostrar_asientos():
     a=0
@@ -13,7 +8,7 @@ def mostrar_asientos():
     for b in range (5):
         print("|",end="  ")
         for a in range(3):
-            if(asientos[b][a] in asientos_ocupados):
+            if(asientos[b][a] in asientos_ocupados): #asientos[b][a] son cordenadas del array creado al inicio y comprueba si ese asiento en particular se encuentra en los asientos ocupados
                 asiento= "X "
             elif(asientos[b][a]<10):
                 asiento= str(round(asientos[b][a]))+" "
@@ -50,13 +45,11 @@ def mostrar_asientos():
         print(" |")
     print("\n")
     print(lista_vueloL)
-    print(asientos_ocupados)
+    #print(asientos_ocupados)
     if op=="1":
         mostrar_opciones() #solo lo muestra cuando la opción es 1 en el menu mostrar_opciones; si es op==2 (Compra de asientos), tambien visualiza los asientos, pero no vuelve a mostrar las opciones, sino que continua con la compra de asientos.
-     
-#función registrar datos del pasajero:
 
-def ingreso():
+def ingreso(): #función registrar datos del pasajero:
     nombre= (input("\nFavor ingrese su nombre: "))
     rut=0    
     celular=0
@@ -144,6 +137,8 @@ def comprar_asiento():
                     cliente.popitem()
                     eleccion=0
                     retorno="R"
+def modificar():
+    print("work")
 
 def mostrar_opciones():
     global cliente
@@ -156,17 +151,16 @@ def mostrar_opciones():
             mostrar_asientos()
         elif op=="2":
             comprar_asiento()
-        elif op=="3":
-            lista_vuelo.pop()
+        elif op=="3": #anula el vuelto que se compro en el momento, y deja el asiento disponible. (no especifica que sea un vuelo anterior)
+            lista_vueloL.pop()
             cliente={}
-            print(lista_vuelo)
+            #print(lista_vueloL)
             mostrar_opciones()
         elif op=="4":
-            mostrar_opciones()
+            modificar()
         elif op=="5":
             np.save('file.npy', lista_vueloL) #Cierra el programa, y guarda los cambios sobreescribiendo el archivo npy, donde almacenamos nuestra lista de pasajeros con su respectivo asiento
             print("\n¡ Hasta pronto !\n")
-
 
 asientos= np.zeros((7,6)) # inicio del programa creamos la matriz de los asientos y damos la bienvenida
 i=1
@@ -179,16 +173,17 @@ print("¡ Bienvenido a Vuelos-Duoc !\n")
 try:
     asientos_ocupados=[] # creamos la lista asientos ocupados
     cliente = {} #Se define como diccionario la variable cliente, guarda sus datos + su asiento.
-    lista_vuelo = np.load('file.npy', allow_pickle='TRUE')
-    print(lista_vuelo)
+    lista_vuelo = np.load('file.npy', allow_pickle='TRUE') #array
     for asiento in lista_vuelo: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
         asientos_ocupados.append(asiento["Asiento"])
-    lista_vueloL=lista_vuelo.tolist() #Utilizamos el array como lista para poder acceder al metodo tradicional de append (insertar nuevos clientes)
+    lista_vueloL=lista_vuelo.tolist() #Utilizamos el array como lista para poder acceder al metodo tradicional de append (insertar nuevos clientes) 
+    #print(lista_vuelo)
     mostrar_opciones() 
     
 except FileNotFoundError: 
     asientos_ocupados=[] # creamos la lista Asientos ocupados
     lista_vuelo=[{"Nombre":"none","Rut":0,"Celular":0,"Banco":"none","Asiento":0}]  #Al no existir una lista anterior, creamos la variable lista_vuelo, con un cliente ficticio para que el valor de la clave asiento exista
     np.save('file.npy', lista_vuelo)
-    lista_vueloL=lista_vuelo.tolist() #Utilizamos el array como lista para poder acceder al metodo tradicional de append (insertar nuevos clientes)
+    lista_vuelo = np.load('file.npy', allow_pickle='TRUE')
+    lista_vueloL=lista_vuelo.tolist()
     mostrar_opciones()
