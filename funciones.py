@@ -1,14 +1,13 @@
 import numpy as np
 
-def matriz():
+def matriz(): # inicio del programa creamos la matriz de los asientos 
     global asientos
-    asientos= np.zeros((7,6)) # inicio del programa creamos la matriz de los asientos y damos la bienvenida
+    asientos= np.zeros((7,6)) 
     i=1
     for c in range(7):
         for f in range(6):
             asientos[c][f]=i
             i=i+1
-
 
 def creacion():
     global lista_vueloL
@@ -106,7 +105,7 @@ def ingreso(): #función registrar datos del pasajero:
             
     while(True):
         try:
-            celular= int(input("Ingrese su número de celular sin ante sin anteponer el 9: "))
+            celular= int(input("Ingrese su número de celular sin anteponer el 9: "))
             celular_test= celular  #Se crea una variable alterna para no tocar el número de telefono que 8 digitos exactos (sin considerar el 9 o +569).
             cont=0
             while celular_test>0:
@@ -128,52 +127,54 @@ def ingreso(): #función registrar datos del pasajero:
     global cliente
     cliente={"Nombre":nombre,"Rut":rut,"Celular":celular,"Banco":banco} #completados los datos correctamente, guardamos los datos del cliente en un diccionario.
 
-#función comprar asientos:
-
-def comprar_asiento():
+def comprar_asiento(): #función comprar asientos, llama a la funcion ingreso, para registrar al usuario, y luego llama a la funcion mostrar asientos (para indicar cuales se encuentran disponibles)
     global asientos_ocupados
     ingreso()
     retorno="R"
     while retorno=="R":
-        conf="" #creamos la variable conf (de confirmación) para cuando se utilice en el ciclo while para confirmar asiento o cambiarlo
-        retorno=""
-        mostrar_asientos()
-        print("Los asientos marcados con una X, no se encuentran disponibles.\nDesde el asiento 31 al 42 son para pasajeros VIP.\n\nLos precios son:\n\n - Asiento normal: $ 78.900\n - Asiento VIP: $ 240.000\n")
-        eleccion=int(input("Favor, Seleccione un asiento: "))
-        while eleccion in asientos_ocupados:
-            eleccion=int(input("Ese asiento no esta disponible, favor seleccione otro asiento: "))
-        else:
-            asiento_escogido={"Asiento":eleccion}
-            cliente.update(asiento_escogido)
-            if 0<eleccion and eleccion<31:
-                precio=78900
-            elif 31<=eleccion and eleccion<43:
-                precio=240000
-            precio= round(precio-precio*descuento)
-            print(f"El precio a pagar es de: $ {precio}.") 
-            if(descuento==0.15):
-                print("Descuento aplicado por perternecer a 'bancoDuoc': 15%")
-            while(conf != "S" and conf != "C" and conf != "M"):
-                conf=input("\n  - Para confirmar asiento, presione S.\n  - Para cambiar asiento presione C.\n\nOpcion: ").upper()
+        try:  
+            conf="" #creamos la variable conf (de confirmación) para cuando se utilice en el ciclo while para confirmar asiento o cambiarlo
+            mostrar_asientos()
+            print("Los asientos marcados con una X, no se encuentran disponibles.\nDesde el asiento 31 al 42 son para pasajeros VIP.\n\nLos precios son:\n\n - Asiento normal: $ 78.900\n - Asiento VIP: $ 240.000\n")
+            eleccion=int(input("Favor, Seleccione un asiento: "))
+            while eleccion in asientos_ocupados or eleccion<=0 or eleccion>42:
+                eleccion=int(input("Ese asiento no esta disponible, favor seleccione otro asiento: "))
             else:
-                if conf=="S":
-                    lista_vueloL.append(cliente.copy())
-                    asientos_ocupados=[] #vacio de la lista, de asientos ocupados y la actualizo según la lista de vuelo, asi no se generan datos repetitivos.
-                    print(asientos_ocupados)
-                    for asiento in lista_vueloL: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
-                        asientos_ocupados.append(asiento["Asiento"])
-                    np.save('file.npy', lista_vuelo) #actualizamos la lista de vuelo en nuestro archivo donde registramos los pasajeros con sus datos y asientos.
-                    print(asientos_ocupados)
-                    print("Asiento asignado, sus datos son los siguientes:\n")
-                    for datos in cliente:
-                        print(datos,":",cliente[datos])
-                    print("\nDisfrute su vuelo, gracias por preferir Vuelos-Duoc.\n")
-                    mostrar_opciones()
-                elif conf=="C":
-                    cliente.popitem()
-                    eleccion=0
-                    retorno="R"
-def modificar():
+                asiento_escogido={"Asiento":eleccion}
+                cliente.update(asiento_escogido)
+                if 0<eleccion and eleccion<31:
+                    precio=78900
+                elif 31<=eleccion and eleccion<43:
+                    precio=240000
+                precio= round(precio-precio*descuento)
+                print(f"El precio a pagar es de: $ {precio}.") 
+                if(descuento==0.15):
+                    print("Descuento aplicado por perternecer a 'bancoDuoc': 15%")
+                while(conf != "S" and conf != "C" and conf != "M"):
+                    conf=input("\n  - Para confirmar asiento, presione S.\n  - Para cambiar asiento presione C.\n\nOpcion: ").upper()
+                else:
+                    if conf=="S":
+                        lista_vueloL.append(cliente.copy())
+                        asientos_ocupados=[] #vacio de la lista, de asientos ocupados y la actualizo según la lista de vuelo, asi no se generan datos repetitivos.
+                        print(asientos_ocupados)
+                        for asiento in lista_vueloL: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
+                            asientos_ocupados.append(asiento["Asiento"])
+                        np.save('file.npy', lista_vuelo) #actualizamos la lista de vuelo en nuestro archivo donde registramos los pasajeros con sus datos y asientos.
+                        #print(asientos_ocupados)
+                        print("Asiento asignado, sus datos son los siguientes:\n")
+                        for datos in cliente:
+                            print(datos,":",cliente[datos])
+                        print("\nDisfrute su vuelo, gracias por preferir Vuelos-Duoc.\n")
+                        break
+                    elif conf=="C":
+                        cliente.popitem()
+                        eleccion=0
+                        retorno="R"
+        except:
+            print("Error de ingreso, favor vuelva a intentar")  
+    mostrar_opciones()  
+    
+def modificar(): #modifica los datos del usuario solicitando la comparacionde rut & número de asiento deontre del registro de compras de asientos.
     index=0
     asiento_mod=0000000
     op_chance="0" # opción inicializada de cambio.
@@ -193,16 +194,16 @@ def modificar():
             print("Error de ingreso, favor vuelva a intentar")
     for test in lista_vueloL:
         index=index+1
-        if rut_mod==test["Rut"]:
-            asiento_mod= test["Asiento"]
-            print(index)
-            print(asiento_mod)
+        if rut_mod==test["Rut"]: #compara el rut ingresado, con los rut de la lista base de rut de pasajeros
+            asiento_mod= test["Asiento"] #obtengo el asiento asociado al rut en cuestión
+            #print(index)    # prueba el indique que nos encontramos
+            #print(asiento_mod)    # muestra el asiento asociado al rut correcto. (solo para ir comprobando) 
     while(True): #validamos que la entrada sea del tipo entero, división sobre 0 
         try:
-            asiento_cambio= int(input("indique su asiento: "))
+            asiento_cambio= int(input("indique su asiento: ")) 
         except:
             print("Error de ingreso") 
-        if(asiento_cambio==asiento_mod):
+        if(asiento_cambio==asiento_mod): #comparo el asiento ingresado con el que ya tengo asociado al rut, si se cumple, se visualiza el submanu de acontinuación, y sino vuelve al menu principal
             while(op_chance != "1" and op_chance != "2"):
                 op_chance= input("Ingrese una opcion:\n \n1. Cambiar nombre \n2. Modificar teléfono \n\nOpcion: ")
             else:
@@ -237,24 +238,21 @@ def modificar():
                 break 
         else:
             print("\nCombinación rut-asiento errónea\n")
-    print("\n")
+            break
     mostrar_opciones()
 
 def anular_vuelo():
     cantidad_pasajeros_actual=len(lista_vueloL) 
     if cantidad_pasajeros_inicial<cantidad_pasajeros_actual: #nos aseguramos que no pueda eliminar otros pasajeros de anteriores compras.
         cliente={}
-        #print(cliente)
-        lista_vueloL.pop() #eliminamos al pasajero de su lista de pasajeros con sus datos
+        lista_vueloL.pop()
         asientos_ocupados.pop() #eliminamos el asiento en nuestra lista de asientos ocupados.
         print("\n*** Compra anulada ***\n")
     else:
         print("\nOpción inválida, usuario no tiene compra asociada.\n")
     mostrar_opciones()
-def modificar():
-    print("work")
 
-def mostrar_opciones():
+def mostrar_opciones(): #creacion de menu principal
     global cliente
     global op
     op=""
