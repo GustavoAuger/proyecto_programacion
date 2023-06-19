@@ -1,8 +1,44 @@
 import numpy as np
 
+def matriz():
+    global asientos
+    asientos= np.zeros((7,6)) # inicio del programa creamos la matriz de los asientos y damos la bienvenida
+    i=1
+    for c in range(7):
+        for f in range(6):
+            asientos[c][f]=i
+            i=i+1
+
+
+def creacion():
+    global lista_vueloL
+    global lista_vuelo
+    global cantidad_pasajeros_inicial
+    global asientos_ocupados
+    
+    asientos_ocupados=[] # creamos la lista asientos ocupados
+    #intenta abrir un registro de reservas de un archivo npy (simulando una bd), si es que existe. Sino crea un un archivo npy:
+    try:
+        cliente = {} #Se define como diccionario la variable cliente, guarda sus datos + su asiento.
+        lista_vuelo = np.load('file.npy', allow_pickle='TRUE') #array
+        #print(lista_vuelo)
+
+        
+    except FileNotFoundError: 
+        lista_vuelo=[{"Nombre":"none","Rut":0,"Celular":0,"Banco":"none","Asiento":0}]  #Al no existir una lista de pasajeros anterior, creamos la variable lista_vuelo, con un cliente ficticio para que el valor de la clave asiento exista
+        np.save('file.npy', lista_vuelo)
+        lista_vuelo = np.load('file.npy', allow_pickle='TRUE')
+        lista_vueloL=lista_vuelo.tolist()
+    for asiento in lista_vuelo: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
+        asientos_ocupados.append(asiento["Asiento"])
+    lista_vueloL=lista_vuelo.tolist() #Utilizamos el array como lista para poder acceder al metodo tradicional de append (insertar nuevos clientes) 
+    cantidad_pasajeros_inicial=len(lista_vueloL) #para tener el control de la cantidad de pasajeros inicial, a la hora de eliminar el último asiento
+
+#función mostrar los asientos disponibles // printea los números del array los ordena y reemplaza por X cuando coincide los asientos ocupados con el del array original
 def mostrar_asientos():
     a=0
     b=0
+    global asientos
     print("Asientos del vuelo:\n")
     for b in range (5):
         print("|",end="  ")
@@ -43,8 +79,8 @@ def mostrar_asientos():
             print(asiento,end=" ")
         print(" |")
     print("\n")
-    print(lista_vueloL)
-    #print(asientos_ocupados)
+    #print(lista_vueloL) lista de los pasajeros con sus datos
+    #print(asientos_ocupados) lista de los asientos que se encuentran ocupados
     if op=="1":
         mostrar_opciones() #solo lo muestra cuando la opción es 1 en el menu mostrar_opciones; si es op==2 (Compra de asientos), tambien visualiza los asientos, pero no vuelve a mostrar las opciones, sino que continua con la compra de asientos.
 
@@ -208,13 +244,15 @@ def anular_vuelo():
     cantidad_pasajeros_actual=len(lista_vueloL) 
     if cantidad_pasajeros_inicial<cantidad_pasajeros_actual: #nos aseguramos que no pueda eliminar otros pasajeros de anteriores compras.
         cliente={}
-        print(cliente)
-        lista_vueloL.pop()
-        print("\n*** Compra anulada ***\n.")
-        mostrar_opciones()
+        #print(cliente)
+        lista_vueloL.pop() #eliminamos al pasajero de su lista de pasajeros con sus datos
+        asientos_ocupados.pop() #eliminamos el asiento en nuestra lista de asientos ocupados.
+        print("\n*** Compra anulada ***\n")
     else:
         print("\nOpción inválida, usuario no tiene compra asociada.\n")
-        mostrar_opciones()
+    mostrar_opciones()
+def modificar():
+    print("work")
 
 def mostrar_opciones():
     global cliente
@@ -234,31 +272,3 @@ def mostrar_opciones():
         elif op=="5":
             np.save('file.npy', lista_vueloL) #Cierra el programa, y guarda los cambios sobreescribiendo el archivo npy, donde almacenamos nuestra lista de pasajeros con su respectivo asiento
             print("\n¡ Hasta pronto !\n")
-
-asientos= np.zeros((7,6)) # inicio del programa creamos la matriz de los asientos y damos la bienvenida
-i=1
-for c in range(7):
-    for f in range(6):
-        asientos[c][f]=i
-        i=i+1
-print("¡ Bienvenido a Vuelos-Duoc !\n")
-#intenta abrir un registro de reservas de un archivo npy (simulando una bd), si es que existe. Sino crea un un archivo npy:
-try:
-    asientos_ocupados=[] # creamos la lista asientos ocupados
-    cliente = {} #Se define como diccionario la variable cliente, guarda sus datos + su asiento.
-    lista_vuelo = np.load('file.npy', allow_pickle='TRUE') #array
-    for asiento in lista_vuelo: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
-        asientos_ocupados.append(asiento["Asiento"])
-    lista_vueloL=lista_vuelo.tolist() #Utilizamos el array como lista para poder acceder al metodo tradicional de append (insertar nuevos clientes) 
-    cantidad_pasajeros_inicial=len(lista_vueloL) #para tener el control de la cantidad de pasajeros inicial, a la hora de eliminar el último asiento
-    #print(lista_vuelo)
-    mostrar_opciones() 
-    
-except FileNotFoundError: 
-    asientos_ocupados=[] # creamos la lista Asientos ocupados
-    lista_vuelo=[{"Nombre":"none","Rut":0,"Celular":0,"Banco":"none","Asiento":0}]  #Al no existir una lista de pasajeros anterior, creamos la variable lista_vuelo, con un cliente ficticio para que el valor de la clave asiento exista
-    np.save('file.npy', lista_vuelo)
-    lista_vuelo = np.load('file.npy', allow_pickle='TRUE')
-    lista_vueloL=lista_vuelo.tolist()
-    cantidad_pasajeros_inicial=len(lista_vueloL) #para tener el control de la cantidad de pasajeros inicial, a la hora de eliminar el último asiento
-    mostrar_opciones()
