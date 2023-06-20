@@ -1,5 +1,5 @@
 import numpy as np
-
+from itertools import cycle
 def matriz(): # inicio del programa creamos la matriz de los asientos 
     global asientos
     asientos= np.zeros((7,6)) 
@@ -10,29 +10,25 @@ def matriz(): # inicio del programa creamos la matriz de los asientos
             i=i+1
 
 def creacion():
-    global lista_vueloL
+    global cliente
     global lista_vuelo
     global cantidad_pasajeros_inicial
     global asientos_ocupados
-    
-    asientos_ocupados=[] # creamos la lista asientos ocupados
+    asientos_ocupados=[] # creamos la lista asientos ocupados "el asiento 0"
     #intenta abrir un registro de reservas de un archivo npy (simulando una bd), si es que existe. Sino crea un un archivo npy:
     try:
         cliente = {} #Se define como diccionario la variable cliente, guarda sus datos + su asiento.
-        lista_vuelo = np.load('file.npy', allow_pickle='TRUE') #array
-        #print(lista_vuelo)
-
-        
-    except FileNotFoundError: 
-        lista_vuelo=[{"Nombre":"none","Rut":0,"Celular":0,"Banco":"none","Asiento":0}]  #Al no existir una lista de pasajeros anterior, creamos la variable lista_vuelo, con un cliente ficticio para que el valor de la clave asiento exista
+        lista_vuelo = np.load('file.npy', allow_pickle='TRUE') 
+    except FileNotFoundError:
+        lista_vuelo=[{"Nombre":"none","Rut":0,"Celular":0,"Banco":"none","Asiento":0}]  #Al no existir una "lista" de vuelo anterior, creamos la variable lista_vuelo del tipo array, con un cliente ficticio para que el valor de la clave asiento en el diccionario exista"
         np.save('file.npy', lista_vuelo)
         lista_vuelo = np.load('file.npy', allow_pickle='TRUE')
-        lista_vueloL=lista_vuelo.tolist()
+    lista_vuelo=lista_vuelo.tolist()
     for asiento in lista_vuelo: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
-        asientos_ocupados.append(asiento["Asiento"])
-    lista_vueloL=lista_vuelo.tolist() #Utilizamos el array como lista para poder acceder al metodo tradicional de append (insertar nuevos clientes) 
-    cantidad_pasajeros_inicial=len(lista_vueloL) #para tener el control de la cantidad de pasajeros inicial, a la hora de eliminar el último asiento
-
+        asientos_ocupados.append(asiento["Asiento"]) #se le asirgna valor 0 que viene del diccionario dentro de la lista_vuelo, el cual no existe el asiento el valor 0 (no afecta para el uso del programa), pero nos sirve para ir comparando con el array inicial, de esta forma cuando se ocupe un asiento lo reemplaza por la varible X cuando este pintando los valores de la matriz
+    cantidad_pasajeros_inicial=len(lista_vuelo) #para tener el control de la cantidad de pasajeros inicial, a la hora de eliminar el último asiento
+ #   print(asientos_ocupados) #de control para ver cual(es), son los asientos ocupados
+#    print(lista_vuelo)
 #función mostrar los asientos disponibles // printea los números del array los ordena y reemplaza por X cuando coincide los asientos ocupados con el del array original
 def mostrar_asientos():
     a=0
@@ -78,27 +74,26 @@ def mostrar_asientos():
             print(asiento,end=" ")
         print(" |")
     print("\n")
-    #print(lista_vueloL) lista de los pasajeros con sus datos
+    #print(lista_vuelo) lista de los pasajeros con sus datos
     #print(asientos_ocupados) lista de los asientos que se encuentran ocupados
     if op=="1":
         mostrar_opciones() #solo lo muestra cuando la opción es 1 en el menu mostrar_opciones; si es op==2 (Compra de asientos), tambien visualiza los asientos, pero no vuelve a mostrar las opciones, sino que continua con la compra de asientos.
 
-def ingreso(): #función registrar datos del pasajero:
-    nombre= input("\nFavor ingrese su nombre: ")
-    rut=0    
-    celular=0
-    banco=0
+def ingreso(): #función registrar datos del pasajero: 
+    global cliente
+    nombre= input("\nIngrese su nombre: ")
     while(True): #validamos que la entrada sea del tipo entero, división sobre 0 
         try:
-            rut= int(input("ingrese su rut, sin punto ni guión: "))
+            rut= int(input("Ingrese su rut, sin punto ni guión, ni dígito veriicador: "))
             rut_test= rut     #Se crea una variable alterna para no tocar el rut ingresado que debe tener 8 a 9 digitos (sin considerar puntos ni guion).
             cont=0
             while rut_test>0:
                 cont=cont+1              #cuenta la cantidad de digitos al repetirse el siglo de la divion parte entera, mientras sea mayor a 0.
                 rut_test= rut_test//10
-            if cont<8 or cont>9:
+            if cont<7 or cont>8:
                 print("rut inválido")
             else:
+                rut= str(rut)+"-"+digito_verificador(rut)
                 break
         except:
             print("Error de ingreso, favor vuelva a intentar")      
@@ -111,27 +106,29 @@ def ingreso(): #función registrar datos del pasajero:
             while celular_test>0:
                 cont=cont+1                #cuenta la cantidad de digitos al repetirse el siglo de la divion parte entera , mientras sea mayor a 0.
                 celular_test= celular_test//10 
-            if cont!=8:
+            if cont!=8: #si la cantidad ingresada no es 8 exacta no deja continuar hasta qu sea la cantidad de 8 números exactos.
                 print("Telefono inválido")
             else:
+                celular="+569 "+str(celular)
                 banco= input("Si pertenece al banco 'bancoDuoc'('15%' de descuento), presione 'B', de lo contrario ingrese su banco: ").upper()
                 global descuento
                 if banco=="B":
                     descuento=0.15
+                    banco="bancoDuoc" 
                 else:
                     descuento=0
                 break
         except:
             print("Error de ingreso, favor vuelva a intentar")    
     print("\nDatos ingresados correctamente\n\n")
-    global cliente
     cliente={"Nombre":nombre,"Rut":rut,"Celular":celular,"Banco":banco} #completados los datos correctamente, guardamos los datos del cliente en un diccionario.
-
+    
 def comprar_asiento(): #función comprar asientos, llama a la funcion ingreso, para registrar al usuario, y luego llama a la funcion mostrar asientos (para indicar cuales se encuentran disponibles)
     global asientos_ocupados
+    global cliente
     ingreso()
     retorno="R"
-    while retorno=="R":
+    while retorno=="R": 
         try:  
             conf="" #creamos la variable conf (de confirmación) para cuando se utilice en el ciclo while para confirmar asiento o cambiarlo
             mostrar_asientos()
@@ -154,23 +151,25 @@ def comprar_asiento(): #función comprar asientos, llama a la funcion ingreso, p
                     conf=input("\n  - Para confirmar asiento, presione S.\n  - Para cambiar asiento presione C.\n\nOpcion: ").upper()
                 else:
                     if conf=="S":
-                        lista_vueloL.append(cliente.copy())
+                        print(lista_vuelo)
+                        lista_vuelo.append(cliente.copy())
                         asientos_ocupados=[] #vacio de la lista, de asientos ocupados y la actualizo según la lista de vuelo, asi no se generan datos repetitivos.
                         print(asientos_ocupados)
-                        for asiento in lista_vueloL: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento 
+                        print(lista_vuelo)
+                        for asiento in lista_vuelo: #De acuerdo a la lista de vuelo, toma el valor de la clave Asiento - en ciclo se usa "asiento"  para hacerlo más representativo
                             asientos_ocupados.append(asiento["Asiento"])
                         np.save('file.npy', lista_vuelo) #actualizamos la lista de vuelo en nuestro archivo donde registramos los pasajeros con sus datos y asientos.
-                        #print(asientos_ocupados)
+                        print(asientos_ocupados)
                         print("Asiento asignado, sus datos son los siguientes:\n")
                         for datos in cliente:
                             print(datos,":",cliente[datos])
                         print("\nDisfrute su vuelo, gracias por preferir Vuelos-Duoc.\n")
                         break
                     elif conf=="C":
-                        cliente.popitem()
+                        cliente.popitem() #elimina solo el asiento del diccionario cliente
                         eleccion=0
                         retorno="R"
-        except:
+        except: 
             print("Error de ingreso, favor vuelva a intentar")  
     mostrar_opciones()  
     
@@ -178,21 +177,23 @@ def modificar(): #modifica los datos del usuario solicitando la comparacionde ru
     index=0
     asiento_mod=0000000
     op_chance="0" # opción inicializada de cambio.
+    print("Para realizar esta opción, necesitamos válidar sus datos.")
     while(True): #validamos que la entrada sea del tipo entero, división sobre 0 
         try:
-            rut_mod= int(input("ingrese su rut, sin punto ni guión: "))
-            rut_test1= rut_mod     #Se crea una variable alterna para no tocar el rut ingresado que debe tener 8 a 9 digitos (sin considerar puntos ni guion).
+            rut_mod= int(input("Ingrese su rut, sin punto ni guión, ni dígito veriicador: "))
+            rut_test= rut_mod    #Se crea una variable alterna para no tocar el rut ingresado que debe tener 8 a 9 digitos (sin considerar puntos ni guion).
             cont=0
-            while rut_test1>0:
+            while rut_test>0:
                 cont=cont+1              #cuenta la cantidad de digitos al repetirse el siglo de la divion parte entera, mientras sea mayor a 0.
-                rut_test1= rut_test1//10
-            if cont<8 or cont>9:
-                print("Rut inválido")
+                rut_test= rut_test//10
+            if cont<7 or cont>8:
+                print("rut inválido")
             else:
+                rut_mod= str(rut_mod)+"-"+digito_verificador(rut_mod)
                 break
         except:
-            print("Error de ingreso, favor vuelva a intentar")
-    for test in lista_vueloL:
+            print("Error de ingreso, favor vuelva a intentar")   
+    for test in lista_vuelo:
         index=index+1
         if rut_mod==test["Rut"]: #compara el rut ingresado, con los rut de la lista base de rut de pasajeros
             asiento_mod= test["Asiento"] #obtengo el asiento asociado al rut en cuestión
@@ -208,16 +209,17 @@ def modificar(): #modifica los datos del usuario solicitando la comparacionde ru
                 op_chance= input("Ingrese una opcion:\n \n1. Cambiar nombre \n2. Modificar teléfono \n\nOpcion: ")
             else:
                 if op_chance=="1":
-                    cliente_chance=(lista_vueloL[index-1]) # usamos el index obtenido anteriormente -1, pues el indice comienza desde 0.
-                    cliente_chance["Nombre"]= input("\nFavor ingrese nombre a cambiar: ")
-                    lista_vueloL[index-1]=cliente_chance
+                    cliente_chance=(lista_vuelo[index-1]) # usamos el index obtenido anteriormente -1, pues el indice comienza desde 0.
+                    cliente_chance["Nombre"]= input("\nIngrese nuevo nombre: ")
+                    lista_vuelo[index-1]=cliente_chance
                     print("\nDatos modificados correctamente:\n")
-                    for datos in cliente:
+                    for datos in cliente_chance:
                         print(datos,":",cliente_chance[datos])
+                    print("") #salto     
                 elif op_chance=="2":
                     while(True):
                         try:
-                            celular_new= int(input("Ingrese su número de celular sin anteponer el 9: "))
+                            celular_new= int(input("Ingrese su nuevo número de celular, sin anteponer el 9: "))
                             celular_test= celular_new  #Se crea una variable alterna para no tocar el número de telefono que 8 digitos exactos (sin considerar el 9 o +569).
                             cont=0
                             while celular_test>0:
@@ -226,12 +228,14 @@ def modificar(): #modifica los datos del usuario solicitando la comparacionde ru
                             if cont!=8:
                                 print("Telefono inválido")
                             else:
-                                cliente_chance_cel=(lista_vueloL[index-1]) # usamos el index obtenido anteriormente -1, pues el indice comienza desde 0.
-                                cliente_chance_cel["Celular"]= celular_new
-                                lista_vueloL[index-1]=cliente_chance_cel
+                                celular_new="+569 "+str(celular_new)
+                                cliente_chance_cel=(lista_vuelo[index-1]) # usamos el index obtenido anteriormente -1, pues el indice comienza desde 0. accedemos al diccionario correspondiente a su index
+                                cliente_chance_cel["Celular"]= celular_new #modificamos el celular 
+                                lista_vuelo[index-1]=cliente_chance_cel
                                 print("\nDatos modificados correctamente:\n")
-                                for datos in cliente:
+                                for datos in cliente_chance_cel:
                                     print(datos,":",cliente_chance_cel[datos])
+                                print("") #salto     
                                 break
                         except:
                             print("Error de ingreso, favor vuelva a intentar")  
@@ -239,25 +243,40 @@ def modificar(): #modifica los datos del usuario solicitando la comparacionde ru
         else:
             print("\nCombinación rut-asiento errónea\n")
             break
+    np.save('file.npy', lista_vuelo) #actualizamos la lista de vuelo
     mostrar_opciones()
 
 def anular_vuelo():
-    cantidad_pasajeros_actual=len(lista_vueloL) 
+    global cliente
+    respuesta=""
+    cantidad_pasajeros_actual=len(lista_vuelo) 
     if cantidad_pasajeros_inicial<cantidad_pasajeros_actual: #nos aseguramos que no pueda eliminar otros pasajeros de anteriores compras.
-        cliente={}
-        lista_vueloL.pop()
-        asientos_ocupados.pop() #eliminamos el asiento en nuestra lista de asientos ocupados.
-        print("\n*** Compra anulada ***\n")
+        while (respuesta!="S" and respuesta!="N"):
+            print("¿Esta seguro que desea eliminar su compra asociada a los siguientes datos? (S/N):\n")
+            for datos in cliente:
+                print(datos,":",cliente[datos])
+            respuesta= input("\nRespuesta: ").upper()
+        else:
+            if respuesta=="S":
+                cliente={}
+                lista_vuelo.pop()
+                asientos_ocupados.pop() #eliminamos el asiento en nuestra lista de asientos ocupados.
+                print("\n*** Compra anulada ***\n")
+            elif respuesta=="N":
+                print("\n***Su compra no ha sido anulada*** \n")
+            else:
+                print("Opción, inválida, ingrese nuevamente.")
     else:
         print("\nOpción inválida, usuario no tiene compra asociada.\n")
+    np.save('file.npy', lista_vuelo) #actualizamos la lista de vuelo
     mostrar_opciones()
 
 def mostrar_opciones(): #creacion de menu principal
-    global cliente
     global op
     op=""
     while(op != "1" and op != "2" and op != "3" and op != "4" and op != "5"):
         op= input("Ingrese una opcion:\n \n1. Ver asientos disponibles \n2. Comprar asiento \n3. Anular vuelo \n4. Modificar datos de pasajero \n5. Salir\n\nOpcion: ")
+        print("") #salto
     else:
         if op=="1":
             mostrar_asientos()
@@ -268,5 +287,15 @@ def mostrar_opciones(): #creacion de menu principal
         elif op=="4":
             modificar()
         elif op=="5":
-            np.save('file.npy', lista_vueloL) #Cierra el programa, y guarda los cambios sobreescribiendo el archivo npy, donde almacenamos nuestra lista de pasajeros con su respectivo asiento
+            np.save('file.npy', lista_vuelo) #Cierra el programa, y guarda los cambios sobreescribiendo el archivo npy, donde almacenamos nuestra lista de pasajeros con su respectivo asiento
             print("\n¡ Hasta pronto !\n")
+
+#funcion para calcular digito verificador: (funcion extra, como bunus)
+def digito_verificador(rut):
+    reversed_digits = map(int, reversed(str(rut)))
+    factors = cycle(range(2, 8))
+    s = sum(d * f for d, f in zip(reversed_digits, factors))
+    if (-s) % 11==10:
+        return "k"
+    else:
+        return str((-s) % 11)
