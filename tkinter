@@ -1,0 +1,40 @@
+import numpy as np
+import tkinter as tk
+
+# Funciones y código existente del programa de vuelos...
+
+# Crear ventana principal
+ventana = tk.Tk()
+ventana.title("Programa de Vuelos")
+
+# Funciones para manejar eventos de los botones
+def mostrar_asientos():
+    # Lógica para mostrar los asientos en la interfaz gráfica
+    pass
+
+def comprar_asiento():
+    # Lógica para comprar un asiento y mostrarlo en la interfaz gráfica
+    pass
+
+def modificar():
+    # Lógica para modificar los datos de un pasajero y actualizar la interfaz gráfica
+    pass
+
+def anular_vuelo():
+    # Lógica para anular un vuelo y actualizar la interfaz gráfica
+    pass
+
+# Crear botones
+btn_mostrar_asientos = tk.Button(ventana, text="Mostrar Asientos", command=mostrar_asientos)
+btn_comprar_asiento = tk.Button(ventana, text="Comprar Asiento", command=comprar_asiento)
+btn_modificar = tk.Button(ventana, text="Modificar Pasajero", command=modificar)
+btn_anular_vuelo = tk.Button(ventana, text="Anular Vuelo", command=anular_vuelo)
+
+# Colocar botones en la ventana
+btn_mostrar_asientos.pack()
+btn_comprar_asiento.pack()
+btn_modificar.pack()
+btn_anular_vuelo.pack()
+
+# Iniciar el bucle de eventos
+ventana.mainloop()
